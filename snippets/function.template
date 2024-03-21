@@ -1,0 +1,8 @@
+${func_type} ${func_name}(${func_header_arg_list})
+{
+${declaration_block}
+
+${func_body}
+
+return ${func_ret_val};
+}

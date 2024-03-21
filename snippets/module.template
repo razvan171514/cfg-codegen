@@ -1,0 +1,6 @@
+#pragma clang diagnostic ignored "-Wunused-value"
+#pragma clang diagnostic ignored "-Wliteral-range"
+
+${headers}
+
+${implementations}

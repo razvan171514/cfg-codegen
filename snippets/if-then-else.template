@@ -1,0 +1,8 @@
+if (${condition})
+{
+${then_body}
+}
+else
+{
+${else_body}
+}

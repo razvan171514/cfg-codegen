@@ -5,7 +5,7 @@ import random
 from Functions import Function
 from Instructions import CallInstruction
 
-from Functions import random_funcion
+from Functions import random_funcion, generate_func_cfg
 from Instructions import random_noop
 
 #...Module...
@@ -83,11 +83,11 @@ def generate_random_connected_dag(list_of_nodes, m):
 
     return call_list
 
-def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10) -> Module :
+def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10, max_cfg_width_depth=5, max_cfg_length_depth=5) -> Module :
     module = Module(start_func, target_func)
 
     for _ in range(no_functions-2):
-        func = random_funcion(random.randint(0, 5))
+        func = generate_func_cfg(wd=max_cfg_width_depth, ld=max_cfg_length_depth)
         module.add_function(func)
 
     calls = generate_random_connected_dag([module.start] + module.funcitons + [module.target], callgraph_edges)

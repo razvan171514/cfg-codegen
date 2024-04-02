@@ -1,73 +1,52 @@
 from optparse import OptionParser
-from string import Template
-from typing import Dict, Tuple, List
 import random
-import nltk
 import subprocess
 import os
-from functools import partial
 
-from util import C_DATA_TYPES, indent_c_code
+from Module import *
+from Functions import *
+from Instructions import *
+from Conditionals import *
+from util import *
 
 parser = OptionParser()
 parser.add_option('-f', '--functions', dest='no_functions', default=3, help='Number of functions on the longest callgraph path')
 parser.add_option('-e', '--callgraph-edges', dest='callgraph_edges', default=6, help='Number of nodes in the CFG of a function')
+parser.add_option('--wd', dest='func_if_depth', default=5, help='Maximum depth of the if statemnts of the cfg of a function')
+parser.add_option('--ld', dest='func_len_depth', default=5, help='Maximum length of the if statemnts of the cfg of a function')
 parser.add_option('-o', '--output', dest='output_file', default='sample.c', help='Output file name')
 parser.add_option('-c', '--compile-output', dest='compile', action="store_true", default=False, help='Use clang to compile output source code')
 parser.add_option('--opt-callgraph', dest='gen_callgraph', action="store_true", default=False, help='Generate callgraph of compiled sample source code. Option is ignored if -c is not provided')
 parser.add_option('--opt-cfg', dest='gen_cfg', action="store_true", default=False, help='Generate cfg for each function compiled sample source code. Option is ignored if -c is not provided')
 
-######################################DeclarationBlock##########################################################################
-from Functions import DeclarationBlock, random_declaration_block
-#######################################################################################################################
-
-from Functions import Function
-
-#######################################################################################################################
-
-from Instructions import NoOp, random_noop
-from Instructions import GoTo
-from Instructions import CallInstruction
-from Instructions import InstructionBlock, random_simple_instruction_block
-
-#######################################################################################################################
-
-from Conditionals import Condition, random_condition
-from Conditionals import IfThen, random_ifthen
-from Conditionals import IfThenElse
-
-#######################################################################################################################
-
-from Module import Module, random_module
-
-#######################################################################################################################
-
-start_test_func = Function().set_return_type('int')\
-    .set_func_name('setsockopt_test')\
-    .set_header_arg_list({"a": "int", "b": "int"})\
-    .set_return_value('a')\
-    .set_declaration_block(random_declaration_block())
-
-for index in range(1, 5):
-    ift = IfThen(random_condition(start_test_func.symbol_table, var='var_3'))\
-        .set_then_block(InstructionBlock().add_block(random_noop(start_test_func.symbol_table)).add_block(GoTo('lastop')))
-    start_test_func.set_body(ift)
-start_test_func.set_body(random_noop(start_test_func.symbol_table, 'lastop'))
-
-target_test_func = Function().set_return_type('int')\
-    .set_func_name('ns_capable')\
-    .set_header_arg_list({"cap": "int"})\
-    .set_return_value('cap')\
-    .set_declaration_block(random_declaration_block())
-target_test_func.set_body(random_noop(target_test_func.symbol_table), end_block=True)
-
 (options, args) = parser.parse_args()
 
 if __name__ == '__main__':
+    start_test_func = Function().set_return_type('int')\
+        .set_func_name('setsockopt_test')\
+        .set_header_arg_list({"a": "int", "b": "int"})\
+        .set_return_value('a')\
+        .set_declaration_block(random_declaration_block())
+
+    for index in range(1, 5):
+        ift = IfThen(random_condition(start_test_func.symbol_table, var='var_3'))\
+            .set_then_block(InstructionBlock().add_block(random_noop(start_test_func.symbol_table)).add_block(GoTo('lastop')))
+        start_test_func.set_body(ift)
+    start_test_func.set_body(random_noop(start_test_func.symbol_table, 'lastop'))
+
+    target_test_func = Function().set_return_type('int')\
+        .set_func_name('ns_capable')\
+        .set_header_arg_list({"cap": "int"})\
+        .set_return_value('cap')\
+        .set_declaration_block(random_declaration_block())
+    target_test_func.set_body(random_noop(target_test_func.symbol_table), end_block=True)
+
     mod = random_module(start_test_func,\
                         target_test_func,\
                         no_functions=int(options.no_functions),\
-                        callgraph_edges=int(options.callgraph_edges))
+                        callgraph_edges=int(options.callgraph_edges),\
+                        max_cfg_width_depth=int(options.func_if_depth),\
+                        max_cfg_length_depth=int(options.func_len_depth))
 
     with open(options.output_file, 'w') as output_file:
         output_file.write(indent_c_code(str(mod)))

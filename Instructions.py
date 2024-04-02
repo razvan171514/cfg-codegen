@@ -47,7 +47,7 @@ class InstructionBlock:
 
 def random_simple_instruction_block(symbol_table: Dict[str, str]) -> InstructionBlock:
     ins_block = InstructionBlock()
-    for _ in range(random.randint(0, 5)):
+    for _ in range(random.randint(1, 5)):
         ins_block.add_block(random_noop(symbol_table))
     return ins_block
 

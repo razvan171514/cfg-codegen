@@ -22,27 +22,33 @@ parser.add_option('--opt-cfg', dest='gen_cfg', action="store_true", default=Fals
 (options, args) = parser.parse_args()
 
 if __name__ == '__main__':
-    start_test_func = Function().set_return_type('int')\
+    source_func = Function().set_return_type('int')\
         .set_func_name('setsockopt_test')\
         .set_header_arg_list({"a": "int", "b": "int"})\
         .set_return_value('a')\
         .set_declaration_block(random_declaration_block())
+    source_func.set_body(\
+        generate_complete_cfg_block(\
+                                    source_func.symbol_table,\
+                                    wd=int(options.func_if_depth),\
+                                    ld=int(options.func_len_depth)\
+                                    )\
+    )
 
-    for index in range(1, 5):
-        ift = IfThen(random_condition(start_test_func.symbol_table, var='var_3'))\
-            .set_then_block(InstructionBlock().add_block(random_noop(start_test_func.symbol_table)).add_block(GoTo('lastop')))
-        start_test_func.set_body(ift)
-    start_test_func.set_body(random_noop(start_test_func.symbol_table, 'lastop'))
-
-    target_test_func = Function().set_return_type('int')\
+    target_func = Function().set_return_type('int')\
         .set_func_name('ns_capable')\
         .set_header_arg_list({"cap": "int"})\
         .set_return_value('cap')\
         .set_declaration_block(random_declaration_block())
-    target_test_func.set_body(random_noop(target_test_func.symbol_table), end_block=True)
+    target_func.set_body(\
+        generate_complete_cfg_block(\
+                                    target_func.symbol_table,\
+                                    wd=int(options.func_if_depth),\
+                                    ld=int(options.func_len_depth)\
+                                    )\
+    )
 
-    mod = random_module(start_test_func,\
-                        target_test_func,\
+    mod = random_module(source_func, target_func,\
                         no_functions=int(options.no_functions),\
                         callgraph_edges=int(options.callgraph_edges),\
                         max_cfg_width_depth=int(options.func_if_depth),\

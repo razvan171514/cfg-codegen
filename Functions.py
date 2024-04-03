@@ -144,11 +144,15 @@ def generate_cfg_block(symbol_table: Dict[str, str], depth = 1) -> InstructionBl
     inst_blk.add_block(ifte)
     
     inst_blk.add_block(random_simple_instruction_block(symbol_table))
+    return inst_blk
 
+def generate_complete_cfg_block(symbol_table: Dict[str, str], wd = 1, ld = 1) -> InstructionBlock:
+    inst_blk = InstructionBlock()
+    for _ in range(ld):
+        inst_blk.add_block(generate_cfg_block(symbol_table, wd))
     return inst_blk
 
 def generate_func_cfg(ld=3, wd=1, complete_func=False) -> Function:
     func = random_funcion(random.randint(0, 5))
-    for _ in range(ld):
-        func.set_body(generate_cfg_block(func.symbol_table, wd), end_block=complete_func)
+    func.set_body(generate_complete_cfg_block(func.symbol_table, wd, ld), end_block=False)
     return func

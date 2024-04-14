@@ -1,6 +1,8 @@
 from string import Template
 from typing import Dict, Tuple, List
 import random
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 from Functions import Function
 from Instructions import CallInstruction
@@ -86,9 +88,12 @@ def generate_random_connected_dag(list_of_nodes, m):
 def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10, max_cfg_width_depth=5, max_cfg_length_depth=5) -> Module :
     module = Module(start_func, target_func)
 
-    for _ in range(no_functions-2):
-        func = generate_func_cfg(wd=max_cfg_width_depth, ld=max_cfg_length_depth)
-        module.add_function(func)
+    generate_CFG = partial(generate_func_cfg, max_cfg_length_depth, max_cfg_width_depth)
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        results = executor.map(generate_CFG, range(no_functions))
+
+        for func in results:
+            module.add_function(func)
 
     calls = generate_random_connected_dag([module.start] + module.funcitons + [module.target], callgraph_edges)
     calls = list(map(lambda pair: CallInstruction(pair[0], pair[1]), calls))
@@ -99,7 +104,7 @@ def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10,
     for func in module.funcitons:
         func.set_body(random_noop(func.symbol_table), end_block=True)
     
-    module.start.set_body(random_noop(func.symbol_table), end_block=True)
-    module.target.set_body(random_noop(func.symbol_table), end_block=True)
+    module.start.set_body(random_noop(module.start.symbol_table), end_block=True)
+    module.target.set_body(random_noop(module.target.symbol_table), end_block=True)
 
     return module

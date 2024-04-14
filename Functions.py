@@ -1,7 +1,7 @@
 from string import Template
 from typing import Dict, Tuple, List
 import random
-import nltk
+from wonderwords import RandomWord
 
 from util import C_DATA_TYPES
 
@@ -104,18 +104,19 @@ class Function:
 #..........
 
 def random_funcion(header_arg_list_length) -> Function:
-    words = nltk.corpus.words.words()
+    word_validity_regex = '^(?!auto$|break$|case$|char$|const$|continue$|default$|do$|double$|else$|enum$|extern$|float$|for$|goto$|if$|int$|long$|register$|return$|short$|signed$|sizeof$|static$|struct$|switch$|typedef$|union$|unsigned$|void$|volatile$|while$)(?!.*-)[a-zA-Z]+$'
+    word_generator = RandomWord()
     rand_arg_list = {}
 
     for _ in range(header_arg_list_length):
-        random_var_name = random.choice(words).lower()
+        random_var_name = word_generator.word(regex=word_validity_regex)
         random_var_type = random.choice(list(C_DATA_TYPES.keys()))
         rand_arg_list[random_var_name] = random_var_type
 
 
     func = Function()\
         .set_return_type(random.choice(list(C_DATA_TYPES.keys())))\
-        .set_func_name(random.choice(words).lower())\
+        .set_func_name(word_generator.word(regex=word_validity_regex))\
         .set_header_arg_list(rand_arg_list)\
         .set_declaration_block(random_declaration_block())
 

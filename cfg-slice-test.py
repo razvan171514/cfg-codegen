@@ -18,16 +18,11 @@ def print_cmd(cmd: List[str]):
         acc += (el + " ")
     return acc
 
-results_file = open('results/cfg-slice-test.csv', 'w')
-
-# for no_functions in range(15, 40):
-#     generate_c_code_cmd[NO_FUNC_CMD_INDEX] = str(no_functions)
-#     for no_calls in range(no_functions-1, (no_functions * (no_functions - 1)) // 2):
-#         generate_c_code_cmd[NO_CALLS_CMD_INDEX] = str(no_calls)
+results_file = open('results/cfg-slice-test.csv', 'a')
         
-for ld in range(1, 20):
+for ld in range(1, 4):
     generate_c_code_cmd[FUNC_CFG_LD_INDEX] = str(ld)
-    for wd in range(1, 40):
+    for wd in range(1, 15):
         generate_c_code_cmd[FUNC_CFG_WD_INDEX] = str(wd)
 
         avg = 0

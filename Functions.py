@@ -2,6 +2,8 @@ from string import Template
 from typing import Dict, Tuple, List
 import random
 from wonderwords import RandomWord
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 from util import C_DATA_TYPES
 
@@ -147,10 +149,29 @@ def generate_cfg_block(symbol_table: Dict[str, str], depth = 1) -> InstructionBl
     inst_blk.add_block(random_simple_instruction_block(symbol_table))
     return inst_blk
 
+# def generate_cfg_block(symbol_table: Dict[str, str], depth = 1):
+#     template_file = f"snippets/if-else-depth/wd_{depth}.template"
+#     with open(template_file, 'r') as file:
+#         template = file.read()
+
+#     for i in range(2**depth - 1):
+#         template = template.replace(f"<cond_{i}>", str(random_condition(symbol_table)))
+    
+#     for i in range(2**(depth+1) - 1):
+#         template = template.replace(f"<block_{i}>", str(random_simple_instruction_block(symbol_table)))
+
+#     return template
+
 def generate_complete_cfg_block(symbol_table: Dict[str, str], wd = 1, ld = 1) -> InstructionBlock:
     inst_blk = InstructionBlock()
-    for _ in range(ld):
-        inst_blk.add_block(generate_cfg_block(symbol_table, wd))
+
+    jobs = [[symbol_table,  wd] for i in range(ld)]
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        results = executor.map(lambda p: generate_cfg_block(*p), jobs)
+
+        for block in results:
+            inst_blk.add_block(block)
+
     return inst_blk
 
 def generate_func_cfg(ld=3, wd=1, complete_func=False) -> Function:

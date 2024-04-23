@@ -5,7 +5,7 @@ from wonderwords import RandomWord
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
-from util import C_DATA_TYPES
+from util import C_DATA_TYPES, ContextualTemplateObject
 
 #...DeclarationBlock...
 
@@ -94,7 +94,7 @@ class Function:
         self.template_string = t.safe_substitute(declaration_block = declarations)
         return self
 
-    def set_body(self, body, end_block = False):
+    def set_body(self, body: ContextualTemplateObject, end_block = False):
         t = Template(self.template_string)
         body_str = '{block}\n{terminator}'.format(\
             block = body.print_contextual(self.symbol_table),\
@@ -132,9 +132,8 @@ def random_funcion(header_arg_list_length) -> Function:
 
     return func.set_return_value(return_val)
 
-from Conditionals import IfThenElse, random_condition
+from Conditionals import IfThenElse
 from Instructions import InstructionBlock, random_simple_instruction_block
-from util import indent_c_code
 
 def generate_cfg_block(depth = 1) -> InstructionBlock:
     inst_blk = InstructionBlock()
@@ -157,7 +156,7 @@ def generate_cfg_block(depth = 1) -> InstructionBlock:
 #         template = file.read()
 
 #     for i in range(2**depth - 1):
-#         template = template.replace(f"<cond_{i}>", str(random_condition(symbol_table)))
+#         template = template.replace(f"<cond_{i}>", str(Condition.print_contextual(symbol_table)))
     
 #     for i in range(2**(depth+1) - 1):
 #         template = template.replace(f"<block_{i}>", str(random_simple_instruction_block(symbol_table)))

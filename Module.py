@@ -8,7 +8,7 @@ from Functions import Function
 from Instructions import CallInstruction
 
 from Functions import random_funcion, generate_complete_cfg_block
-from Instructions import random_noop
+from Instructions import NoOp
 
 #...Module...
 
@@ -101,9 +101,9 @@ def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10,
         call.caller.set_body(call, end_block=False)
 
     for func in module.funcitons:
-        func.set_body(random_noop(), end_block=True)
+        func.set_body(NoOp(), end_block=True)
     
-    module.start.set_body(random_noop(), end_block=True)
-    module.target.set_body(random_noop(), end_block=True)
+    module.start.set_body(NoOp(), end_block=True)
+    module.target.set_body(NoOp(), end_block=True)
 
     return module

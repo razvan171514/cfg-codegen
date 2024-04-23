@@ -1,12 +1,12 @@
 from typing import Dict, List, Tuple
 import random
 
-from util import C_DATA_TYPES
+from util import C_DATA_TYPES, ContextualTemplateObject
 from Functions import Function, random_declaration_block
 
 #...NoOp...
 
-class NoOp:
+class NoOp(ContextualTemplateObject):
     def __init__(self, label = ''):
         self.label = label
 
@@ -16,14 +16,6 @@ class NoOp:
         if self.label != '':
             return f"{self.label}: {op};"
         return f"{op};"
-    
-    def __str__(self):
-        if self.label != '':
-            return f"{self.label}: i;"
-        return f"i;"
-
-def random_noop(label = ''):
-    return NoOp(label)
 
 #..........
 
@@ -40,31 +32,28 @@ class GoTo:
 
 #...InstructionBlock...
 
-class InstructionBlock:
+class InstructionBlock(ContextualTemplateObject):
     def __init__(self):
         self.block_array = []
 
-    def add_block(self, block):
+    def add_block(self, block: ContextualTemplateObject):
         self.block_array.append(block)
         return self
 
     def print_contextual(self, symbol_table: Dict[str, str]) -> str:
         return "\n".join(instr.print_contextual(symbol_table) for instr in self.block_array)
 
-    def __str__(self):
-        return "\n".join(str(instr) for instr in self.block_array)
-
 def random_simple_instruction_block() -> InstructionBlock:
     ins_block = InstructionBlock()
     for _ in range(random.randint(1, 5)):
-        ins_block.add_block(random_noop())
+        ins_block.add_block(NoOp())
     return ins_block
 
 #..........
 
 #...CallInstruction...
 
-class CallInstruction:
+class CallInstruction(ContextualTemplateObject):
     def __init__(self, caller : Function, callee : Function):
         self.caller = caller
         self.callee = callee

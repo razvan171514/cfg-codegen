@@ -1,4 +1,5 @@
 import random
+from typing import Dict
 
 C_DATA_TYPES = {
     "int": lambda: random.randint(-100, 100),
@@ -28,3 +29,8 @@ def indent_c_code(c_code):
         indented_code += indented_line + '\n'
     
     return indented_code.strip()
+
+
+class ContextualTemplateObject:
+    def print_contextual(self, context: Dict[str, str]) -> str:
+        pass

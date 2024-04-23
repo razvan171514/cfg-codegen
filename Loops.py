@@ -5,13 +5,11 @@ from typing import Dict
 
 from util import C_DATA_TYPES, ContextualTemplateObject
 
-#...For loop...
-class For(ContextualTemplateObject):
-    TEMPLATE_FILE = 'snippets/for.template'
+class GenericLoop(ContextualTemplateObject):
     VALID_REGEX = '^(?!auto$|break$|case$|char$|const$|continue$|default$|do$|double$|else$|enum$|extern$|float$|for$|goto$|if$|int$|long$|register$|return$|short$|signed$|sizeof$|static$|struct$|switch$|typedef$|union$|unsigned$|void$|volatile$|while$)(?!.*-)[a-zA-Z]+$'
 
-    def __init__(self):
-        with open(self.TEMPLATE_FILE, 'r') as templ_file: 
+    def __init__(self, template_file_name):
+        with open(template_file_name, 'r') as templ_file: 
             self.template_string = templ_file.read()
         
         self.counter_variable_name = RandomWord().word(regex=self.VALID_REGEX)
@@ -51,25 +49,22 @@ class For(ContextualTemplateObject):
                 loop_post_instr = self.get_loop_increment_instruction(),\
                 loop_body = self.loop_body.print_contextual(symbol_table))
 
+
+#...For loop...
+class For(GenericLoop):
+    TEMPLATE_FILE = 'snippets/for.template'
+
+    def __init__(self):
+        super().__init__(self.TEMPLATE_FILE)
+
 #................
 
 #...While loop...
 
-class While:
+class While(GenericLoop):
     TEMPLATE_FILE = 'snippets/while.template'
 
     def __init__(self):
-        with open(self.TEMPLATE_FILE, 'r') as templ_file: 
-            self.template_string = templ_file.read()
-        
-    def set_body(self, body):
-        t = Template(self.template_string)
-        self.template_string = t.safe_substitute(while_body = str(body))
-        return self
-
-    #TODO
-
-    def __str__(self):
-        return self.template_string
-
+        super().__init__(self.TEMPLATE_FILE)
+    
 #................

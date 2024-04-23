@@ -166,11 +166,8 @@ def generate_cfg_block(depth = 1) -> InstructionBlock:
 def generate_complete_cfg_block(wd = 1, ld = 1) -> InstructionBlock:
     inst_blk = InstructionBlock()
 
-    jobs = [[wd] for i in range(ld)]
-    with ThreadPoolExecutor(max_workers=12) as executor:
-        results = executor.map(lambda p: generate_cfg_block(*p), jobs)
-
-        for block in results:
-            inst_blk.add_block(block)
+    if_template = generate_cfg_block(depth=wd)
+    for _ in range(ld):
+        inst_blk.add_block(if_template)
 
     return inst_blk

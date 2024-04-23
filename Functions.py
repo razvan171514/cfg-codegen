@@ -96,7 +96,9 @@ class Function:
 
     def set_body(self, body, end_block = False):
         t = Template(self.template_string)
-        body_str = '{block}\n{terminator}'.format(block = body, terminator = '${func_body}' if not end_block else '')
+        body_str = '{block}\n{terminator}'.format(\
+            block = body.print_contextual(self.symbol_table),\
+            terminator = '${func_body}' if not end_block else '')
         self.template_string = t.safe_substitute(func_body = body_str)
         return self
 
@@ -134,19 +136,19 @@ from Conditionals import IfThenElse, random_condition
 from Instructions import InstructionBlock, random_simple_instruction_block
 from util import indent_c_code
 
-def generate_cfg_block(symbol_table: Dict[str, str], depth = 1) -> InstructionBlock:
+def generate_cfg_block(depth = 1) -> InstructionBlock:
     inst_blk = InstructionBlock()
-    inst_blk.add_block(random_simple_instruction_block(symbol_table))
+    inst_blk.add_block(random_simple_instruction_block())
 
     if depth == 0:
         return inst_blk
 
-    ifte = IfThenElse(random_condition(symbol_table))\
-        .set_then_block(generate_cfg_block(symbol_table, depth-1))\
-        .set_else_block(generate_cfg_block(symbol_table, depth-1))
+    ifte = IfThenElse()\
+        .set_then_block(generate_cfg_block(depth-1))\
+        .set_else_block(generate_cfg_block(depth-1))
     inst_blk.add_block(ifte)
     
-    inst_blk.add_block(random_simple_instruction_block(symbol_table))
+    inst_blk.add_block(random_simple_instruction_block())
     return inst_blk
 
 # def generate_cfg_block(symbol_table: Dict[str, str], depth = 1):
@@ -162,10 +164,10 @@ def generate_cfg_block(symbol_table: Dict[str, str], depth = 1) -> InstructionBl
 
 #     return template
 
-def generate_complete_cfg_block(symbol_table: Dict[str, str], wd = 1, ld = 1) -> InstructionBlock:
+def generate_complete_cfg_block(wd = 1, ld = 1) -> InstructionBlock:
     inst_blk = InstructionBlock()
 
-    jobs = [[symbol_table,  wd] for i in range(ld)]
+    jobs = [[wd] for i in range(ld)]
     with ThreadPoolExecutor(max_workers=12) as executor:
         results = executor.map(lambda p: generate_cfg_block(*p), jobs)
 
@@ -173,8 +175,3 @@ def generate_complete_cfg_block(symbol_table: Dict[str, str], wd = 1, ld = 1) ->
             inst_blk.add_block(block)
 
     return inst_blk
-
-def generate_func_cfg(ld=3, wd=1, complete_func=False) -> Function:
-    func = random_funcion(random.randint(0, 5))
-    func.set_body(generate_complete_cfg_block(func.symbol_table, wd, ld), end_block=False)
-    return func

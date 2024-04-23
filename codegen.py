@@ -30,7 +30,6 @@ if __name__ == '__main__':
         .set_declaration_block(random_declaration_block())
     source_func.set_body(\
         generate_complete_cfg_block(\
-                                    source_func.symbol_table,\
                                     wd=int(options.func_if_depth),\
                                     ld=int(options.func_len_depth)\
                                     )\
@@ -43,7 +42,6 @@ if __name__ == '__main__':
         .set_declaration_block(random_declaration_block())
     target_func.set_body(\
         generate_complete_cfg_block(\
-                                    target_func.symbol_table,\
                                     wd=int(options.func_if_depth),\
                                     ld=int(options.func_len_depth)\
                                     )\

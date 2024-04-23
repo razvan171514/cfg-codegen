@@ -7,17 +7,23 @@ from Functions import Function, random_declaration_block
 #...NoOp...
 
 class NoOp:
-    def __init__(self, var, label = ''):
-        self.op = var
+    def __init__(self, label = ''):
         self.label = label
+
+    def print_contextual(self, symbol_table: Dict[str, str]) -> str:
+        op = random.choice(list(symbol_table.keys()))
+
+        if self.label != '':
+            return f"{self.label}: {op};"
+        return f"{op};"
     
     def __str__(self):
         if self.label != '':
-            return f"{self.label}: {self.op};"
-        return f"{self.op};"
+            return f"{self.label}: i;"
+        return f"i;"
 
-def random_noop(symbol_table: Dict[str, str], label = ''):
-    return NoOp(random.choice(list(symbol_table.keys())), label)
+def random_noop(label = ''):
+    return NoOp(label)
 
 #..........
 
@@ -42,13 +48,16 @@ class InstructionBlock:
         self.block_array.append(block)
         return self
 
+    def print_contextual(self, symbol_table: Dict[str, str]) -> str:
+        return "\n".join(instr.print_contextual(symbol_table) for instr in self.block_array)
+
     def __str__(self):
         return "\n".join(str(instr) for instr in self.block_array)
 
-def random_simple_instruction_block(symbol_table: Dict[str, str]) -> InstructionBlock:
+def random_simple_instruction_block() -> InstructionBlock:
     ins_block = InstructionBlock()
     for _ in range(random.randint(1, 5)):
-        ins_block.add_block(random_noop(symbol_table))
+        ins_block.add_block(random_noop())
     return ins_block
 
 #..........
@@ -75,6 +84,10 @@ class CallInstruction:
                 call_arguments[var_name] = str(C_DATA_TYPES[var_type]())
         
         return call_arguments
+
+    def print_contextual(self, symbol_table: Dict[str, str] = None) -> str:
+        arguments = ", ".join(self.arg_list.values())
+        return f"{self.callee.function_name}({arguments});"
 
     def __str__(self):
         arguments = ", ".join(self.arg_list.values())

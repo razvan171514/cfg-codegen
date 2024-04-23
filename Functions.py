@@ -133,6 +133,7 @@ def random_funcion(header_arg_list_length) -> Function:
     return func.set_return_value(return_val)
 
 from Conditionals import IfThenElse
+from Loops import For, While
 from Instructions import InstructionBlock, random_simple_instruction_block
 
 def generate_cfg_block(depth = 1) -> InstructionBlock:
@@ -163,11 +164,17 @@ def generate_cfg_block(depth = 1) -> InstructionBlock:
 
 #     return template
 
-def generate_complete_cfg_block(wd = 1, ld = 1) -> InstructionBlock:
+def generate_complete_cfg_block(wd = 1, ld = 1, embed_loop = False) -> InstructionBlock:
     inst_blk = InstructionBlock()
 
     if_template = generate_cfg_block(depth=wd)
+    for_template = For().set_body(if_template)
+    while_template = While().set_body(if_template)
+
     for _ in range(ld):
         inst_blk.add_block(if_template)
+
+    if embed_loop:
+        inst_blk.add_block(for_template)
 
     return inst_blk

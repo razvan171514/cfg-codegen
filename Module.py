@@ -85,10 +85,10 @@ def generate_random_connected_dag(list_of_nodes, m):
 
     return call_list
 
-def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10, max_cfg_width_depth=5, max_cfg_length_depth=5) -> Module :
+def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10, max_cfg_width_depth=5, max_cfg_length_depth=5, embed_loop = False) -> Module :
     module = Module(start_func, target_func)
 
-    function_body_template = generate_complete_cfg_block(wd=max_cfg_width_depth, ld=max_cfg_length_depth)
+    function_body_template = generate_complete_cfg_block(wd=max_cfg_width_depth, ld=max_cfg_length_depth, embed_loop=embed_loop)
     for _ in range(no_functions):
         new_function = random_funcion(random.randint(1, 6))
         new_function.set_body(function_body_template)

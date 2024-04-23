@@ -7,6 +7,7 @@ from Module import *
 from Functions import *
 from Instructions import *
 from Conditionals import *
+from Loops import *
 from util import *
 
 parser = OptionParser()

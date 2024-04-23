@@ -1,0 +1,4 @@
+for(${loop_init}; ${loop_condition}; ${loop_post_instr})
+{
+${loop_body}
+}

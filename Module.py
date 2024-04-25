@@ -85,7 +85,11 @@ def generate_random_connected_dag(list_of_nodes, m):
 
     return call_list
 
-def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10, max_cfg_width_depth=5, max_cfg_length_depth=5, embed_loop = False) -> Module :
+def random_module(start_func, target_func,
+                  no_functions = 5, callgraph_edges=10,\
+                  max_cfg_width_depth=5, max_cfg_length_depth=5,\
+                  embed_loop = False,\
+                  shuffle_calls = False) -> Module :
     module = Module(start_func, target_func)
 
     function_body_template = generate_complete_cfg_block(wd=max_cfg_width_depth, ld=max_cfg_length_depth, embed_loop=embed_loop)
@@ -96,17 +100,16 @@ def random_module(start_func, target_func, no_functions = 5, callgraph_edges=10,
     calls = generate_random_connected_dag([module.start] + module.funcitons + [module.target], callgraph_edges)
     
     for func in [module.start, module.target] + module.funcitons:
-        func.set_module_call_list([call for call in calls if call[0] == func])
-        func.set_body(function_body_template, end_block=True)
+        if shuffle_calls:
+            func.set_module_call_list([call for call in calls if call[0] == func])
+        func.set_body(function_body_template, end_block=shuffle_calls)
     
-    # calls = list(map(lambda pair: CallInstruction(pair[0], pair[1]), calls))
-    # for call in calls:
-    #     call.caller.set_body(call, end_block=False)
+    if not shuffle_calls:
+        calls = list(map(lambda pair: CallInstruction(pair[0], pair[1]), calls))
+        for call in calls:
+            call.caller.set_body(call, end_block=False)
 
-    # for func in module.funcitons:
-    #     func.set_body(NoOp(), end_block=True)
-    
-    # module.start.set_body(NoOp(), end_block=True)
-    # module.target.set_body(NoOp(), end_block=True)
+        for func in [module.start, module.target] + module.funcitons:
+            func.set_body(NoOp(), end_block=True)
 
     return module

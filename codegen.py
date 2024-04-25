@@ -16,6 +16,7 @@ parser.add_option('-e', '--callgraph-edges', dest='callgraph_edges', default=6, 
 parser.add_option('--wd', dest='func_if_depth', default=3, help='Maximum depth of the if statemnts of the cfg of a function')
 parser.add_option('--ld', dest='func_len_depth', default=1, help='Maximum length of the if statemnts of the cfg of a function')
 parser.add_option('--embed-loop', dest='embed_loop', action="store_true", default=False, help='Use loops in the function CFG.')
+parser.add_option('--shuffle-calls', dest='shuffle_calls', action="store_true", default=False, help='If set the calls are going to be placed in the middle of the CFG insted of the last basick block of the funciton.')
 parser.add_option('-o', '--output', dest='output_file', default='sample.c', help='Output file name')
 parser.add_option('-c', '--compile-output', dest='compile', action="store_true", default=False, help='Use clang to compile output source code')
 parser.add_option('--opt-callgraph', dest='gen_callgraph', action="store_true", default=False, help='Generate callgraph of compiled sample source code. Option is ignored if -c is not provided')
@@ -41,7 +42,8 @@ if __name__ == '__main__':
                         callgraph_edges=int(options.callgraph_edges),\
                         max_cfg_width_depth=int(options.func_if_depth),\
                         max_cfg_length_depth=int(options.func_len_depth),\
-                        embed_loop=options.embed_loop)
+                        embed_loop=options.embed_loop,\
+                        shuffle_calls=options.shuffle_calls)
 
     with open(options.output_file, 'w') as output_file:
         output_file.write(indent_c_code(str(mod)))

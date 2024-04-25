@@ -48,8 +48,14 @@ class Function:
             self.template_string = templ_file.read()
         self.symbol_table = {}
 
+        self.module_call_list = []
+
     def function_header(self):
         return self.template_string.split('\n')[0] + ';'
+
+    def set_module_call_list(self, calls):
+        self.module_call_list = calls
+        return self
 
     def set_return_type(self, return_type):
         t = Template(self.template_string)
@@ -94,10 +100,11 @@ class Function:
         self.template_string = t.safe_substitute(declaration_block = declarations)
         return self
 
+    # MUST happen after the module sets the call list otherwise the template will NOT get constructed correctly
     def set_body(self, body: ContextualTemplateObject, end_block = False):
         t = Template(self.template_string)
         body_str = '{block}\n{terminator}'.format(\
-            block = body.print_contextual(self.symbol_table),\
+            block = body.print_contextual(self.symbol_table, call_list=self.module_call_list),\
             terminator = '${func_body}' if not end_block else '')
         self.template_string = t.safe_substitute(func_body = body_str)
         return self
@@ -134,7 +141,7 @@ def random_funcion(header_arg_list_length) -> Function:
 
 from Conditionals import IfThenElse
 from Loops import For, While
-from Instructions import InstructionBlock, random_simple_instruction_block
+from Instructions import InstructionBlock, random_simple_instruction_block, CallInstruction
 
 def generate_cfg_block(depth = 1) -> InstructionBlock:
     inst_blk = InstructionBlock()
@@ -149,20 +156,8 @@ def generate_cfg_block(depth = 1) -> InstructionBlock:
     inst_blk.add_block(ifte)
     
     inst_blk.add_block(random_simple_instruction_block())
+    inst_blk.add_block(CallInstruction())
     return inst_blk
-
-# def generate_cfg_block(symbol_table: Dict[str, str], depth = 1):
-#     template_file = f"snippets/if-else-depth/wd_{depth}.template"
-#     with open(template_file, 'r') as file:
-#         template = file.read()
-
-#     for i in range(2**depth - 1):
-#         template = template.replace(f"<cond_{i}>", str(Condition.print_contextual(symbol_table)))
-    
-#     for i in range(2**(depth+1) - 1):
-#         template = template.replace(f"<block_{i}>", str(random_simple_instruction_block(symbol_table)))
-
-#     return template
 
 def generate_complete_cfg_block(wd = 1, ld = 1, embed_loop = False) -> InstructionBlock:
     inst_blk = InstructionBlock()

@@ -1,5 +1,5 @@
 import random
-from typing import Dict
+from typing import Dict, List, Tuple
 
 C_DATA_TYPES = {
     "int": lambda: random.randint(-100, 100),
@@ -32,5 +32,5 @@ def indent_c_code(c_code):
 
 
 class ContextualTemplateObject:
-    def print_contextual(self, context: Dict[str, str]) -> str:
+    def print_contextual(self, context: Dict[str, str], call_list: List[Tuple] = []) -> str:
         pass

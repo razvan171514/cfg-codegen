@@ -29,26 +29,12 @@ if __name__ == '__main__':
         .set_header_arg_list({"a": "int", "b": "int"})\
         .set_return_value('a')\
         .set_declaration_block(random_declaration_block())
-    source_func.set_body(\
-        generate_complete_cfg_block(\
-                                    wd=int(options.func_if_depth),\
-                                    ld=int(options.func_len_depth),\
-                                    embed_loop=options.embed_loop
-                                    )\
-    )
 
     target_func = Function().set_return_type('int')\
         .set_func_name('ns_capable')\
         .set_header_arg_list({"cap": "int"})\
         .set_return_value('cap')\
         .set_declaration_block(random_declaration_block())
-    target_func.set_body(\
-        generate_complete_cfg_block(\
-                                    wd=int(options.func_if_depth),\
-                                    ld=int(options.func_len_depth),\
-                                    embed_loop=options.embed_loop
-                                    )\
-    )
 
     mod = random_module(source_func, target_func,\
                         no_functions=int(options.no_functions),\

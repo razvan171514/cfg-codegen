@@ -13,7 +13,7 @@ class Condition(ContextualTemplateObject):
         self.rhs = None
         self.sign = None
 
-    def print_contextual(self, symbol_table: Dict[str, str]) -> str:
+    def print_contextual(self, symbol_table: Dict[str, str], call_list: List[Tuple] = []) -> str:
         var_name, var_type = random.choice(list(symbol_table.items()))
         sign = random.choice(['==', '>=', '!=', '<=', '>', '<'])
         rhs = C_DATA_TYPES[var_type]()
@@ -45,10 +45,10 @@ class IfThen(ContextualTemplateObject):
         self.condition = None
         self.then_block = None
 
-    def print_contextual(self, symbol_table: Dict[str, str]) -> str:
+    def print_contextual(self, symbol_table: Dict[str, str], call_list: List[Tuple] = []) -> str:
         t = Template(self.template_string)
-        if_statement = t.safe_substitute(condition = self.condition.print_contextual(symbol_table),\
-                                         then_body = (self.then_block.print_contextual(symbol_table) if self.then_block is not None else ''))
+        if_statement = t.safe_substitute(condition = self.condition.print_contextual(symbol_table, call_list),\
+                                         then_body = (self.then_block.print_contextual(symbol_table, call_list) if self.then_block is not None else ''))
         return if_statement
 
 #..........
@@ -83,11 +83,11 @@ class IfThenElse(ContextualTemplateObject):
         self.then_block = None
         self.else_block = None
 
-    def print_contextual(self, symbol_table: Dict[str, str]) -> str:
+    def print_contextual(self, symbol_table: Dict[str, str], call_list: List[Tuple] = []) -> str:
         t = Template(self.template_string)
-        if_statement = t.safe_substitute(condition = self.condition.print_contextual(symbol_table),\
-                                         then_body = (self.then_block.print_contextual(symbol_table) if self.then_block is not None else ''),
-                                         else_body = (self.else_block.print_contextual(symbol_table) if self.else_block is not None else ''))
+        if_statement = t.safe_substitute(condition = self.condition.print_contextual(symbol_table, call_list),\
+                                         then_body = (self.then_block.print_contextual(symbol_table, call_list) if self.then_block is not None else ''),
+                                         else_body = (self.else_block.print_contextual(symbol_table, call_list) if self.else_block is not None else ''))
         return if_statement
 
 #..........

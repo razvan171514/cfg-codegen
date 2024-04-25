@@ -10,7 +10,7 @@ class NoOp(ContextualTemplateObject):
     def __init__(self, label = ''):
         self.label = label
 
-    def print_contextual(self, symbol_table: Dict[str, str]) -> str:
+    def print_contextual(self, symbol_table: Dict[str, str], call_list: List[Tuple] = []) -> str:
         op = random.choice(list(symbol_table.keys()))
 
         if self.label != '':
@@ -40,8 +40,8 @@ class InstructionBlock(ContextualTemplateObject):
         self.block_array.append(block)
         return self
 
-    def print_contextual(self, symbol_table: Dict[str, str]) -> str:
-        return "\n".join(instr.print_contextual(symbol_table) for instr in self.block_array)
+    def print_contextual(self, symbol_table: Dict[str, str], call_list: List[Tuple] = []) -> str:
+        return "\n".join(instr.print_contextual(symbol_table, call_list) for instr in self.block_array)
 
 def random_simple_instruction_block() -> InstructionBlock:
     ins_block = InstructionBlock()
@@ -54,7 +54,12 @@ def random_simple_instruction_block() -> InstructionBlock:
 #...CallInstruction...
 
 class CallInstruction(ContextualTemplateObject):
-    def __init__(self, caller : Function, callee : Function):
+    def __init__(self, caller : Function = None, callee : Function = None):
+        self.caller = caller
+        self.callee = callee
+        self.arg_list = CallInstruction.generate_callee_argument_list(caller, callee) if self.caller is not None and self.callee is not None else []
+
+    def instantiate(self, caller : Function, callee : Function):
         self.caller = caller
         self.callee = callee
         self.arg_list = CallInstruction.generate_callee_argument_list(caller, callee)
@@ -74,11 +79,24 @@ class CallInstruction(ContextualTemplateObject):
         
         return call_arguments
 
-    def print_contextual(self, symbol_table: Dict[str, str] = None) -> str:
-        arguments = ", ".join(self.arg_list.values())
-        return f"{self.callee.function_name}({arguments});"
+    def print_contextual(self, symbol_table: Dict[str, str] = None, call_list: List[Tuple] = []) -> str:
+        if self.caller is not None or self.callee is not None:
+            arguments = ", ".join(self.arg_list.values())
+            return f"{self.callee.function_name}({arguments});"
+        
+        if call_list != []:
+            caller, callee = call_list[0]
+            del call_list[0]
+            arguments = CallInstruction.generate_callee_argument_list(caller, callee)
+        else:
+            return ''
+
+        arguments = ", ".join(arguments.values())
+        return f"{callee.function_name}({arguments});"
 
     def __str__(self):
+        if self.caller is None or self.callee is None:
+            return ''
         arguments = ", ".join(self.arg_list.values())
         return f"{self.callee.function_name}({arguments});"
 

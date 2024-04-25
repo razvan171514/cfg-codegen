@@ -1,7 +1,7 @@
 from string import Template
 import random
 from wonderwords import RandomWord
-from typing import Dict
+from typing import Dict, List, Tuple
 
 from util import C_DATA_TYPES, ContextualTemplateObject
 
@@ -41,7 +41,7 @@ class GenericLoop(ContextualTemplateObject):
     def get_loop_increment_instruction(self):
         return self.counter_variable_name + self.couter_step_increment;
 
-    def print_contextual(self, symbol_table: Dict[str, str] = None) -> str:
+    def print_contextual(self, symbol_table: Dict[str, str] = None, call_list: List[Tuple] = []) -> str:
         return Template(self.template_string)\
             .safe_substitute(\
                 loop_init = self.get_loop_initializer_instruction(),\

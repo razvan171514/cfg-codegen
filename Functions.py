@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 from util import C_DATA_TYPES, ContextualTemplateObject
+# from Instructions import InstructionBlock
 
 #...DeclarationBlock...
 
@@ -91,6 +92,10 @@ class Function:
         t = Template(self.template_string)
         self.template_string = t.safe_substitute(func_header_arg_list = arg_list_to_sting())
         return self
+    
+    def set_def_chains(self, def_chains):
+        self.def_chains = def_chains
+        return self
 
     def set_declaration_block(self, declarations: DeclarationBlock):
         self.declaration_block = declarations
@@ -103,7 +108,11 @@ class Function:
     # MUST happen after the module sets the call list otherwise the template will NOT get constructed correctly
     def set_body(self, body: ContextualTemplateObject, end_block = False):
         t = Template(self.template_string)
-        body_str = '{block}\n{terminator}'.format(\
+
+        def_chains = "\n\n".join(chain.print_contextual(self.symbol_table) for chain in self.def_chains)
+
+        body_str = '{inst_blokcs}\n{block}\n{terminator}'.format(\
+            inst_blokcs = def_chains,\
             block = body.print_contextual(self.symbol_table, call_list=self.module_call_list),\
             terminator = '${func_body}' if not end_block else '')
         self.template_string = t.safe_substitute(func_body = body_str)

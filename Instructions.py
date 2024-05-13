@@ -101,3 +101,43 @@ class CallInstruction(ContextualTemplateObject):
         return f"{self.callee.function_name}({arguments});"
 
 #..........
+
+class BinaryOp(ContextualTemplateObject):
+
+    def __init__(self, res_type, res_name, op, op1, op2):
+        self.result_var = res_name
+        self.result_type = res_type
+
+        self.operand1_name = op1
+        self.operand2_name = op2
+
+        self.operation = op
+
+    def __str__(self):
+        return f"{self.result_var} = {self.operand1_name} {self.operation} {self.operand2_name};"
+
+    def print_contextual(self, context: Dict[str, str], call_list: List[Tuple] = []) -> str:
+        return f"{self.result_var} = {self.operand1_name} {self.operation} {self.operand2_name};"
+
+def random_binary_op_list(symbol_table: Dict[str, str], var: Tuple[str, str] = None, length = 5) -> InstructionBlock:
+    (var_name, var_type) = random.choice(list(symbol_table.items())) if var is None else var
+    inst_blk = InstructionBlock()
+
+    possible_operands = [key for key, ty in symbol_table.items() if ty == var_type and key != var_name]
+
+    for _ in range(length):
+        rand_op = random.choice(['+', '-', '*', '/'])
+        rand_op1 = random.choice(possible_operands) if len(possible_operands) != 0 else C_DATA_TYPES[var_type]()
+        rand_op2 = random.choice(possible_operands) if len(possible_operands) != 0 else C_DATA_TYPES[var_type]()
+    
+        inst_blk.add_block(BinaryOp(var_type, var_name, rand_op, rand_op1, rand_op2))
+
+    return inst_blk
+
+def randim_binary_op_for_all_symbols(symbol_table: Dict[str, str]) -> List[InstructionBlock]:
+    res = []
+
+    for var in symbol_table.items():
+        res.append(random_binary_op_list(symbol_table, var))
+
+    return res

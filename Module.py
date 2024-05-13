@@ -8,7 +8,7 @@ from Functions import Function
 from Instructions import CallInstruction
 
 from Functions import random_funcion, generate_complete_cfg_block
-from Instructions import NoOp
+from Instructions import NoOp, randim_binary_op_for_all_symbols
 
 #...Module...
 
@@ -102,7 +102,8 @@ def random_module(start_func, target_func,
     for func in [module.start, module.target] + module.funcitons:
         if shuffle_calls:
             func.set_module_call_list([call for call in calls if call[0] == func])
-        func.set_body(function_body_template, end_block=shuffle_calls)
+        func.set_def_chains(randim_binary_op_for_all_symbols(func.symbol_table))\
+            .set_body(function_body_template, end_block=shuffle_calls)
     
     if not shuffle_calls:
         calls = list(map(lambda pair: CallInstruction(pair[0], pair[1]), calls))

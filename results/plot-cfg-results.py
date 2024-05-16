@@ -67,17 +67,13 @@ window_size = int(options.wondow_size)
 averaged_data = average_data_by_label(labels, x_values, y_values, window_size)
 
 plt.figure(figsize=(10, 6))
-for label in options.labels.split(','):
+for label in averaged_data.keys():
     (avg_x, avg_y) = averaged_data[label]
     avg_x = list_no_nodes(avg_x, compute_no_nodes)
-    # plt.subplot(1, 2, 1)
-    # plt.grid(True)
-    plt.plot(avg_x, [a * 1e-9 for a in avg_y], marker='o', linestyle='-', label=f'Length depth: {label}')
-    # plt.subplot(1, 2, 2)
-    # plt.plot(avg_x, [avg_y[i] / avg_x[i] for i in range(len(avg_y))], marker='o', linestyle='-', label=f'F(F^-1(x))')
+    plt.plot(avg_x, [a * 1e-9 for a in avg_y], marker='o', linestyle='-', label=f'Implementation: {label}')
 plt.xlabel('Width depth')
 plt.ylabel('Time Axis')
-plt.title('Averaged Scatter Plot with Connecting Lines by Label')
+plt.title('Implementation performance difference')
 plt.legend()
 plt.grid(True)
 plt.tight_layout()

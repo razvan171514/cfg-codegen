@@ -1,6 +1,7 @@
 import os
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 from optparse import OptionParser
 
 def read_csv_file(file_path):
@@ -11,6 +12,16 @@ def read_csv_file(file_path):
             data.append(row)
     return data
 
+def average_data(data, window_size):
+    averaged_x = []
+    averaged_y = []
+    for i in range(0, len(data[0]), window_size):
+        avg_x = np.mean(data[0][i:i+window_size])
+        avg_y = np.mean(data[1][i:i+window_size])
+        averaged_x.append(avg_x)
+        averaged_y.append(avg_y)
+    return averaged_x, averaged_y
+
 def filter_data(data, label, label_value):
     return [row for row in data if row[label] == label_value]
 
@@ -20,9 +31,10 @@ parser.add_option('-x', '--plot-x', dest='plot_x', default='', help='X axis labe
 parser.add_option('-y', '--plot-y', dest='plot_y', default='', help='Y axis label')
 parser.add_option('-n', '--label-name', dest='label_column', default='vertices', help='The name of the column that represents the label to plot.')
 parser.add_option('-l', '--labels', dest='labels', default='25,26', help='Label to plot. Must be comma sepparated label values')
-
-parser.add_option('-w', '--avg-window', dest='wondow_size', default=5, help='Number of points to average for a plot point')
+parser.add_option('-w', '--avg-window', dest='window_size', default=5, help='Number of points to average for a plot point')
 (options, args) = parser.parse_args()
+
+window_size = int(options.window_size)
 
 data = read_csv_file(options.filename)
 
@@ -31,7 +43,8 @@ for label in options.labels.split(','):
     x_vals = [int(row[options.plot_x]) for row in labeled_data]
     y_vals = [int(row[options.plot_y]) for row in labeled_data]
 
-    plt.plot(x_vals, y_vals, label=f"Label: {label}")
+    avg_x, avg_y = average_data((x_vals, y_vals), window_size)
+    plt.plot(avg_x, avg_y, label=f"Label: {label}")
 
 plt.xlabel(options.plot_x)
 plt.ylabel(options.plot_y)

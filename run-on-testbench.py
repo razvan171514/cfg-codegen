@@ -18,7 +18,7 @@ parser.add_option('--pass', dest='pass_name', default='cg-first-test-pass', help
 run_llvm_optimizer_pass[PASS_INDEX] = f"-passes={options.pass_name}"
 
 def extract_variables(file_name):
-    pattern = r'sample-v(\d+)-e(\d+)-ld(\d+)-wd(\d+)-bb(\d+)-try(\d+)\.c'
+    pattern = r'sample-v(\d+)-e(\d+)-ld(\d+)-wd(\d+)-bb(\d+)-try(\d+)\.bc'
     match = re.match(pattern, file_name)
     
     if not match:
@@ -41,14 +41,22 @@ output_file.write('test_file,vertices,edges,length_depth,width_depth,no_basic_bl
 
 periodic_flush = 0
 
-bc_files = os.listdir(options.target_dir)    
+bc_files = os.listdir(options.target_dir)
+
+no_files = len(bc_files)
+curr_file_index = 0
+
 for bc_file in bc_files:
+    if not bc_file.endswith('.bc'):
+        continue
+
     vertices, edges, length_depth, width_depth, basic_blocks, try_no = extract_variables(bc_file)
 
     bc_file_path = os.path.join(options.target_dir, bc_file)
     run_llvm_optimizer_pass[BC_PATH_INDEX] = bc_file_path
 
-    print(f"Running opt:\t{bc_file}")
+    curr_file_index += 1
+    print(f"Running opt ({curr_file_index}/{no_files}):\t{bc_file}")
     start_tm = time.time_ns()
     return_code = sp.call(run_llvm_optimizer_pass, stdout=sp.DEVNULL)
     if return_code != 0:

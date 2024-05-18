@@ -48,8 +48,10 @@ for no_functions in range(int(options.min_functions), int(options.max_functions)
                 generate_c_code_cmd[LD_INDEX] = str(ld)
 
                 for try_no in range(int(options.tries)):
-                    generate_c_code_cmd[TEST_NAME_INDEX] = f"{options.target_dir}/sample-v{no_functions}-e{no_calls}-ld{ld}-wd{wd}-try{try_no}.c"
+                    no_bb = ld*2*(2**wd - 1)
+                    generate_c_code_cmd[TEST_NAME_INDEX] = f"{options.target_dir}/sample-v{no_functions}-e{no_calls}-ld{ld}-wd{wd}-bb{no_bb}-try{try_no}.c"
                     return_code = 1
+                    print(f"Generating: \'{generate_c_code_cmd[TEST_NAME_INDEX]}\'")
                     while return_code != 0:
                         return_code = sp.call(generate_c_code_cmd, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
                     print(f"Generating: \'{generate_c_code_cmd[TEST_NAME_INDEX]}\'\t-- {GREEN}DONE{RESET}")

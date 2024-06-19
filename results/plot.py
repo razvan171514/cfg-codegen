@@ -49,14 +49,14 @@ for label in options.labels.split(','):
     y_vals = [int(row[options.plot_y]) for row in labeled_data]
     avg_x, avg_y = average_data((x_vals, y_vals), window_size)
     
-    plt.plot(avg_x, avg_y, label=f"Label: {label} {options.filename}")
+    plt.plot(avg_x, avg_y, label=f"Label: {label} {options.filename}", marker="o")
     
     if options.compare:
         labeled_against_data = sorted(filter_data(against_data, options.label_column, label), key=lambda x: int(x[options.plot_x]))
         x_a_vals = [int(row[options.plot_x]) for row in labeled_against_data]
         y_a_vals = [int(row[options.plot_y]) for row in labeled_against_data]
         avg_a_x, avg_a_y = average_data((x_a_vals, y_a_vals), window_size)
-        plt.plot(avg_a_x, avg_a_y, label=f"Label: {label} {options.against_filename}")
+        plt.plot(avg_a_x, avg_a_y, label=f"Label: {label} {options.against_filename}", marker="v")
     
 
 plt.xlabel(options.plot_x)

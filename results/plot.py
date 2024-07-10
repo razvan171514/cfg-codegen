@@ -34,6 +34,7 @@ parser.add_option('-l', '--labels', dest='labels', default='25,26', help='Label 
 parser.add_option('-w', '--avg-window', dest='window_size', default=5, help='Number of points to average for a plot point')
 parser.add_option('-c', '--compare', dest='compare', action="store_true", default=False, help='Compare result form -f file with the one from -a file')
 parser.add_option('-a', '--against-file', dest='against_filename', default='results-cg-slice.csv', help='CSV file name to compare -f with')
+parser.add_option('-s', '--save', dest='save_pdf', action="store_true", default=False, help='Save the plot in pdf format')
 (options, args) = parser.parse_args()
 
 window_size = int(options.window_size)
@@ -49,19 +50,26 @@ for label in options.labels.split(','):
     y_vals = [int(row[options.plot_y]) for row in labeled_data]
     avg_x, avg_y = average_data((x_vals, y_vals), window_size)
     
-    plt.plot(avg_x, avg_y, label=f"Label: {label} {options.filename}", marker="o")
+    plt.plot(avg_x, avg_y, label=f"{options.label_column}: {label}", marker="o")
     
     if options.compare:
         labeled_against_data = sorted(filter_data(against_data, options.label_column, label), key=lambda x: int(x[options.plot_x]))
         x_a_vals = [int(row[options.plot_x]) for row in labeled_against_data]
         y_a_vals = [int(row[options.plot_y]) for row in labeled_against_data]
+    #    for v in y_a_vals:
+     #       print(v)
         avg_a_x, avg_a_y = average_data((x_a_vals, y_a_vals), window_size)
         plt.plot(avg_a_x, avg_a_y, label=f"Label: {label} {options.against_filename}", marker="v")
     
 
+title = f"{options.plot_x} vs {options.plot_y} for different {options.label_column}"
 plt.xlabel(options.plot_x)
-plt.ylabel(options.plot_y)
-plt.title(f"{options.plot_x} vs {options.plot_y} for different {options.label_column}")
+plt.ylabel(options.plot_y + ' (ns)')
+#plt.title(title)
 plt.legend()
 plt.grid(True)
+
+if options.save_pdf:
+    plt.savefig(f'./{title}.pdf')
+
 plt.show()

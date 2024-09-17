@@ -26,6 +26,9 @@ class Module:
         self.funcitons.append(func)
         return self
 
+    def is_func_name_valid(self, func_name):
+        return func_name not in list(map(lambda f: f.function_name, self.funcitons))
+
     def __str__(self):
         t = Template(self.template_string)
         headers = '\n'.join(map(lambda f: f.function_header(), [self.start, self.target] + self.funcitons))
@@ -89,12 +92,13 @@ def random_module(start_func, target_func,
                   no_functions = 5, callgraph_edges=10,\
                   max_cfg_width_depth=5, max_cfg_length_depth=5,\
                   embed_loop = False,\
-                  shuffle_calls = False) -> Module :
+                  shuffle_calls = False,\
+                  chain_length=5) -> Module :
     module = Module(start_func, target_func)
 
     function_body_template = generate_complete_cfg_block(wd=max_cfg_width_depth, ld=max_cfg_length_depth, embed_loop=embed_loop)
     for _ in range(no_functions):
-        new_function = random_funcion(random.randint(1, 6))
+        new_function = random_funcion(random.randint(1, 6), module=module)
         module.add_function(new_function)
 
     calls = generate_random_connected_dag([module.start] + module.funcitons + [module.target], callgraph_edges)
@@ -102,7 +106,7 @@ def random_module(start_func, target_func,
     for func in [module.start, module.target] + module.funcitons:
         if shuffle_calls:
             func.set_module_call_list([call for call in calls if call[0] == func])
-        func.set_def_chains(randim_binary_op_for_all_symbols(func.symbol_table))\
+        func.set_def_chains(randim_binary_op_for_all_symbols(func.symbol_table, length=chain_length))\
             .set_body(function_body_template, end_block=shuffle_calls)
     
     if not shuffle_calls:

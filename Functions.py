@@ -109,6 +109,7 @@ class Function:
     def set_body(self, body: ContextualTemplateObject, end_block = False):
         t = Template(self.template_string)
 
+        #def_chains = ''
         def_chains = "\n\n".join(chain.print_contextual(self.symbol_table) for chain in self.def_chains)
 
         body_str = '{inst_blokcs}\n{block}\n{terminator}'.format(\
@@ -123,7 +124,7 @@ class Function:
 
 #..........
 
-def random_funcion(header_arg_list_length) -> Function:
+def random_funcion(header_arg_list_length, module = None) -> Function:
     word_validity_regex = '^(?!auto$|break$|case$|char$|const$|continue$|default$|do$|double$|else$|enum$|extern$|float$|for$|goto$|if$|int$|long$|register$|return$|short$|signed$|sizeof$|static$|struct$|switch$|typedef$|union$|unsigned$|void$|volatile$|while$)(?!.*-)[a-zA-Z]+$'
     word_generator = RandomWord()
     rand_arg_list = {}
@@ -133,10 +134,13 @@ def random_funcion(header_arg_list_length) -> Function:
         random_var_type = random.choice(list(C_DATA_TYPES.keys()))
         rand_arg_list[random_var_name] = random_var_type
 
+    func_name = word_generator.word(regex=word_validity_regex)
+    while module is not None and not module.is_func_name_valid(func_name):
+        func_name = word_generator.word(regex=word_validity_regex)
 
     func = Function()\
         .set_return_type(random.choice(list(C_DATA_TYPES.keys())))\
-        .set_func_name(word_generator.word(regex=word_validity_regex))\
+        .set_func_name(func_name)\
         .set_header_arg_list(rand_arg_list)\
         .set_declaration_block(random_declaration_block())
 
@@ -175,7 +179,8 @@ def generate_complete_cfg_block(wd = 1, ld = 1, embed_loop = False) -> Instructi
     for_template = For().set_body(if_template)
     while_template = While().set_body(if_template)
 
-    for _ in range(ld):
+    lenth_depth = ld if not embed_loop else ld-1
+    for _ in range(lenth_depth):
         inst_blk.add_block(if_template)
 
     if embed_loop:

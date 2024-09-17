@@ -134,10 +134,10 @@ def random_binary_op_list(symbol_table: Dict[str, str], var: Tuple[str, str] = N
 
     return inst_blk
 
-def randim_binary_op_for_all_symbols(symbol_table: Dict[str, str]) -> List[InstructionBlock]:
+def randim_binary_op_for_all_symbols(symbol_table: Dict[str, str], length=5) -> List[InstructionBlock]:
     res = []
 
     for var in symbol_table.items():
-        res.append(random_binary_op_list(symbol_table, var))
+        res.append(random_binary_op_list(symbol_table, var, length=length))
 
     return res
